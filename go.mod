@@ -1,4 +1,4 @@
-module sit
+module github.com/pedramktb/go-odj
 
 go 1.25.7
 
