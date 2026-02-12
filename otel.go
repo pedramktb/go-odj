@@ -16,6 +16,8 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 )
 
+// OtelTrace initializes an OpenTelemetry tracer provider with a gRPC exporter that sends trace data
+// to the specified endpoint using basic authentication.
 func OtelTrace(ctx context.Context, endpoint, user, pass string) (context.Context, error) {
 	if endpoint == "" {
 		return nil, errors.New("otel trace endpoint is required")
@@ -69,6 +71,7 @@ func OtelTrace(ctx context.Context, endpoint, user, pass string) (context.Contex
 	), nil
 }
 
+// OtelTraceMiddleware is an HTTP middleware that extracts OpenTelemetry trace context from incoming requests and injects it into the request context.
 func OtelTraceMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

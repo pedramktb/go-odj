@@ -28,6 +28,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// Postgres establishes a connection pool to a PostgreSQL database using the provided connection parameters and options.
 func Postgres(ctx context.Context, endpoint, db, user, pass string, opts ...typx.KV[string, string]) (*pgxpool.Pool, error) {
 	if endpoint == "" {
 		return nil, errors.New("database endpoint is required")
@@ -73,6 +74,10 @@ func Postgres(ctx context.Context, endpoint, db, user, pass string, opts ...typx
 	return pool, nil
 }
 
+// RunWithPgLock returns a function that executes the provided function within a PostgreSQL advisory lock.
+// The lock is identified by a hash of the given name,ensuring that only one instance of the function can run concurrently
+// across different processes or threads that use the same lock name. If the lock cannot be acquired,
+// the function will log a message and return without executing the provided function.
 func RunWithPgLock(ctx context.Context, db *pgxpool.Pool, name string, fn func(ctx context.Context)) func() error {
 	h := fnv.New64a()
 	_, _ = h.Write([]byte(name))
@@ -144,10 +149,12 @@ func (*queryTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.
 	span.End()
 }
 
+// PostgresTestContainer starts a new Postgres test container with the specified options and returns the container instance.
+// It sets the timezone to UTC and waits for the database system to be ready before returning.
 func PostgresTestContainer(ctx context.Context, opts ...typx.KV[string, string]) (container testcontainers.Container) {
 	_ = os.Setenv("TZ", "UTC")
 
-	postgresContainer, err := postgresC.Run(ctx, "postgres:14.17",
+	postgresContainer, err := postgresC.Run(ctx, "postgres:18.1",
 		postgresC.WithUsername("test"),
 		postgresC.WithPassword("test"),
 		testcontainers.WithWaitStrategy(
@@ -196,6 +203,9 @@ func postgresTestContainerConnection(ctx context.Context, container testcontaine
 	return pool
 }
 
+// PostgresTestContainerCreateDB creates a new database with the specified name in the given Postgres test container,
+// using the provided connection options. It first establishes a connection to the "postgres" database,
+// executes the CREATE DATABASE command, and then returns a new connection pool to the newly created database.
 func PostgresTestContainerCreateDB(ctx context.Context, container testcontainers.Container, name string, opts ...typx.KV[string, string]) *pgxpool.Pool {
 	pool := postgresTestContainerConnection(ctx, container, "postgres", opts...)
 	_, err := pool.Exec(ctx, fmt.Sprintf("CREATE DATABASE %q", name))
@@ -206,6 +216,9 @@ func PostgresTestContainerCreateDB(ctx context.Context, container testcontainers
 	return postgresTestContainerConnection(ctx, container, name, opts...)
 }
 
+// PostgresTestContainerDropDB drops the specified database from the given Postgres test container,
+// using the provided connection pool to execute the drop command. It first closes the existing pool,
+// creates a new connection to the "postgres" database, executes the drop command with force option, and then closes the pool again.
 func PostgresTestContainerDropDB(ctx context.Context, container testcontainers.Container, name string, pool *pgxpool.Pool, opts ...typx.KV[string, string]) {
 	pool.Close()
 	pool = postgresTestContainerConnection(ctx, container, "postgres", opts...)
@@ -213,6 +226,8 @@ func PostgresTestContainerDropDB(ctx context.Context, container testcontainers.C
 	pool.Close()
 }
 
+// PostgresTestContainerSetupDB creates a new database in the given Postgres test container with a name derived from the test name,
+// and returns a connection pool to that database. It also registers a cleanup function to drop the database after the test completes.
 func PostgresTestContainerSetupDB(ctx context.Context, t *testing.T, container testcontainers.Container, opts ...typx.KV[string, string]) *pgxpool.Pool {
 	t.Helper()
 	name := strings.ToLower(strings.ReplaceAll(t.Name(), "/", "_"))

@@ -14,6 +14,10 @@ import (
 	"github.com/pedramktb/go-tagerr"
 )
 
+// OgenErrorHandler is a custom error handler for the Ogen framework that processes different types of errors
+// and generates appropriate HTTP responses. It checks the error type and maps it to a corresponding tagged error,
+// which is then logged and returned as a JSON response with the appropriate HTTP status code and error details.
+// Errors of type tagerr.Err are returned as-is.
 func OgenErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	var (
 		dcParamErr *ogenerrors.DecodeParamsError
@@ -41,10 +45,12 @@ func OgenErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	ogenWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, tagErr.Error())
 }
 
+// OgenEndpointNotFoundErrorHandler is a custom error handler for handling "endpoint not found" errors in the Ogen framework.
 func OgenEndpointNotFoundErrorHandler(w http.ResponseWriter, r *http.Request) {
 	ogenWriteErrorJSON(w, http.StatusNotFound, "endpoint_not_found", fmt.Sprintf("Requested endpoint [%s] could not be found", r.RequestURI))
 }
 
+// OgenMethodNotAllowedErrorHandler is a custom error handler for handling "method not allowed" errors in the Ogen framework.
 func OgenMethodNotAllowedErrorHandler(w http.ResponseWriter, r *http.Request, allowed string) {
 	ogenWriteErrorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "Requested method [%s] is not allowed. Allowed methods are [%s]")
 }

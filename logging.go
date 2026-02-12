@@ -9,6 +9,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+// Logging returns a new context with an attached slog logger. Whenever logging with this logger,
+// if the context at that time contains an active OpenTelemetry span, the logger will automatically
+// include the trace_id and span_id as attributes in the log records.
 func Logging(ctx context.Context) context.Context {
 	return ctxslog.WithAttrs(
 		ctxslog.NewContext(ctx, slogHandler),

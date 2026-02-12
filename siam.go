@@ -2,6 +2,7 @@ package odj
 
 import "encoding/json"
 
+// SIAMGroupMembershipsDTO is a custom type for unmarshaling group memberships from SIAM JWTs.
 type SIAMGroupMembershipsDTO []string
 
 // UnmarshalJSON reads an array of strings into a slice of strings
