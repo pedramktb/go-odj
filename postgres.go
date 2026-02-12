@@ -11,6 +11,7 @@ import (
 	"path"
 	"runtime"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -167,7 +168,7 @@ func PostgresTestContainer(ctx context.Context, opts ...typx.KV[string, string])
 	return postgresContainer
 }
 
-func postgresTestContainerConnection(ctx context.Context, container testcontainers.Container, opts ...typx.KV[string, string]) (db *pgxpool.Pool) {
+func postgresTestContainerConnection(ctx context.Context, container testcontainers.Container, dbName string, opts ...typx.KV[string, string]) (db *pgxpool.Pool) {
 	ip, err := container.Host(ctx)
 	if err != nil {
 		panic(err)
@@ -180,7 +181,7 @@ func postgresTestContainerConnection(ctx context.Context, container testcontaine
 		Scheme: "postgres",
 		User:   url.UserPassword("test", "test"),
 		Host:   fmt.Sprintf("%s:%s", ip, port),
-		Path:   "postgres",
+		Path:   dbName,
 	}
 	q := u.Query()
 	for _, kv := range opts {
@@ -202,25 +203,28 @@ func postgresTestContainerConnection(ctx context.Context, container testcontaine
 }
 
 func PostgresTestContainerCreateDB(ctx context.Context, container testcontainers.Container, name string, opts ...typx.KV[string, string]) *pgxpool.Pool {
-	pool := postgresTestContainerConnection(ctx, container, opts...)
+	pool := postgresTestContainerConnection(ctx, container, "postgres", opts...)
 	_, err := pool.Exec(ctx, fmt.Sprintf("CREATE DATABASE %q", name))
 	if err != nil {
 		panic(err)
 	}
 	pool.Close()
-	return postgresTestContainerConnection(ctx, container, opts...)
+	return postgresTestContainerConnection(ctx, container, name, opts...)
 }
 
-func PostgresTestContainerDeleteDB(ctx context.Context, container testcontainers.Container, name string, pool *pgxpool.Pool, opts ...typx.KV[string, string]) {
+func PostgresTestContainerDropDB(ctx context.Context, container testcontainers.Container, name string, pool *pgxpool.Pool, opts ...typx.KV[string, string]) {
 	pool.Close()
-	pool = postgresTestContainerConnection(ctx, container, opts...)
+	pool = postgresTestContainerConnection(ctx, container, "postgres", opts...)
 	_, _ = pool.Exec(ctx, fmt.Sprintf("DROP DATABASE %q WITH (force)", name))
 	pool.Close()
 }
 
-func PostgresTestContainerSetupDB(ctx context.Context, container testcontainers.Container, name string, opts ...typx.KV[string, string]) (*pgxpool.Pool, func()) {
+func PostgresTestContainerSetupDB(ctx context.Context, t *testing.T, container testcontainers.Container, opts ...typx.KV[string, string]) *pgxpool.Pool {
+	t.Helper()
+	name := strings.ToLower(strings.ReplaceAll(t.Name(), "/", "_"))
 	pool := PostgresTestContainerCreateDB(ctx, container, name, opts...)
-	return pool, func() {
-		PostgresTestContainerDeleteDB(ctx, container, name, pool, opts...)
-	}
+	t.Cleanup(func() {
+		PostgresTestContainerDropDB(ctx, container, name, pool, opts...)
+	})
+	return pool
 }
