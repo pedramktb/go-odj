@@ -163,7 +163,7 @@ func PostgresTestContainer(ctx context.Context, opts ...typx.KV[string, string])
 }
 
 func postgresTestContainerConnection(ctx context.Context, container testcontainers.Container, dbName string, opts ...typx.KV[string, string]) (db *pgxpool.Pool) {
-	ip, err := container.Host(ctx)
+	addr, err := container.Host(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -174,7 +174,7 @@ func postgresTestContainerConnection(ctx context.Context, container testcontaine
 	u := &url.URL{
 		Scheme: "postgres",
 		User:   url.UserPassword("test", "test"),
-		Host:   fmt.Sprintf("%s:%s", ip, port),
+		Host:   addr + ":" + port.Port(),
 		Path:   dbName,
 	}
 	q := u.Query()
