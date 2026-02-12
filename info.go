@@ -3,8 +3,6 @@ package odj
 import (
 	"context"
 	"net/http"
-	"os"
-	"runtime"
 
 	"github.com/go-faster/jx"
 	"github.com/pedramktb/go-envy"
@@ -74,46 +72,6 @@ func InfoHandler(deps ...func(ctx context.Context) (depName string, jsonBytes []
 
 		e.FieldStart("stage")
 		e.Str(Stage.String())
-
-		e.FieldStart("GOMAXPROCS")
-		e.Int(runtime.GOMAXPROCS(0))
-
-		host, err := os.Hostname()
-		if err != nil {
-			host = "unavailable"
-		}
-		e.FieldStart("host")
-		e.Str(host)
-
-		kName, _, _ := envy.Get[string]("KUBERNETES_NAME")
-		if kName != "" {
-			e.FieldStart("name")
-			e.Str(kName)
-		}
-
-		kPodIP, _, _ := envy.Get[string]("KUBERNETES_POD_IP")
-		if kPodIP != "" {
-			e.FieldStart("pod_ip")
-			e.Str(kPodIP)
-		}
-
-		kNode, _, _ := envy.Get[string]("KUBERNETES_NODE_NAME")
-		if kNode != "" {
-			e.FieldStart("node")
-			e.Str(kNode)
-		}
-
-		kNamespace, _, _ := envy.Get[string]("KUBERNETES_NAMESPACE")
-		if kNamespace != "" {
-			e.FieldStart("namespace")
-			e.Str(kNamespace)
-		}
-
-		for i := range deps {
-			name, data := deps[i](r.Context())
-			e.FieldStart(name)
-			e.Raw(data)
-		}
 
 		e.ObjEnd()
 
