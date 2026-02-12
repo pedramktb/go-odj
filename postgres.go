@@ -21,7 +21,6 @@ import (
 	"github.com/pedramktb/go-typx"
 	postgresC "github.com/testcontainers/testcontainers-go/modules/postgres"
 
-	"github.com/pedramktb/go-envy"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.opentelemetry.io/otel/attribute"
@@ -29,29 +28,24 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Postgres(ctx context.Context, component string, opts ...typx.KV[string, string]) (*pgxpool.Pool, error) {
-	prefix := "ODJ_DEP_" + strings.ToUpper(component) + "_DB_"
-	host, _, _ := envy.Get[string](prefix + "HOST")
-	if host == "" {
-		return nil, errors.New(prefix + "HOST is not set")
+func Postgres(ctx context.Context, endpoint, db, user, pass string, opts ...typx.KV[string, string]) (*pgxpool.Pool, error) {
+	if endpoint == "" {
+		return nil, errors.New("database endpoint is required")
 	}
-	db, _, _ := envy.Get[string](prefix + "DATABASE")
 	if db == "" {
-		return nil, errors.New(prefix + "DATABASE is not set")
+		return nil, errors.New("database name is required")
 	}
-	user, _, _ := envy.Get[string](prefix + "USER")
 	if user == "" {
-		return nil, errors.New(prefix + "USER is not set")
+		return nil, errors.New("database user is required")
 	}
-	pass, _, _ := envy.Get[string](prefix + "PASSWORD")
 	if pass == "" {
-		return nil, errors.New(prefix + "PASSWORD is not set")
+		return nil, errors.New("databbase password is required")
 	}
 
 	u := &url.URL{
 		Scheme: "postgres",
 		User:   url.UserPassword(user, pass),
-		Host:   host,
+		Host:   endpoint,
 		Path:   db,
 	}
 

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -30,7 +31,17 @@ type otelProxy struct {
 
 // NewOtelTraceProxy creates a new OpenTelemetry proxy handler that forwards OTLP/HTTP protobuf requests
 // to a configured OTel gRPC collector. This is because ODJ/StackIT did not feel like implementing/allowing OTLP/HTTP.
-func NewOtelTraceProxy(srcComp, endpoint, user, pass string) (http.Handler, error) {
+func NewOtelTraceProxy(srcComponent, endpoint, user, pass string) (http.Handler, error) {
+	if endpoint == "" {
+		return nil, errors.New("otel trace endpoint is required")
+	}
+	if user == "" {
+		return nil, errors.New("otel trace user is required")
+	}
+	if pass == "" {
+		return nil, errors.New("otel trace password is required")
+	}
+
 	var opts []grpc.DialOption
 	if Stage == StageLocal {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -51,7 +62,7 @@ func NewOtelTraceProxy(srcComp, endpoint, user, pass string) (http.Handler, erro
 		attribute.String("otel_proxy.service.name", Component),
 		attribute.String("otel_proxy.service.version", FullVersion),
 		attribute.String("otel_proxy.deployment.environment", Stage.String()),
-		semconv.ServiceNameKey.String(srcComp),
+		semconv.ServiceNameKey.String(srcComponent),
 		semconv.DeploymentEnvironmentNameKey.String(Stage.String()),
 	}
 	p := &otelProxy{

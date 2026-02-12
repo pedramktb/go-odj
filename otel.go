@@ -3,6 +3,7 @@ package odj
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"net/http"
 
 	"github.com/pedramktb/go-ctxotel"
@@ -16,6 +17,16 @@ import (
 )
 
 func OtelTrace(ctx context.Context, endpoint, user, pass string) (context.Context, error) {
+	if endpoint == "" {
+		return nil, errors.New("otel trace endpoint is required")
+	}
+	if user == "" {
+		return nil, errors.New("otel trace user is required")
+	}
+	if pass == "" {
+		return nil, errors.New("otel trace password is required")
+	}
+
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
 		propagation.TraceContext{},
 		propagation.Baggage{},
