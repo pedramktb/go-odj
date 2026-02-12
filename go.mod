@@ -13,6 +13,7 @@ require (
 	github.com/pedramktb/go-envy v1.0.0
 	github.com/pedramktb/go-lifecycle v1.0.0
 	github.com/pedramktb/go-tagerr v1.2.0
+	github.com/pedramktb/go-typx v1.3.0
 	github.com/testcontainers/testcontainers-go v0.40.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.40.0
 	go.opentelemetry.io/otel v1.40.0
@@ -67,6 +68,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
+	go.mongodb.org/mongo-driver v1.17.6 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
 	golang.org/x/crypto v0.47.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

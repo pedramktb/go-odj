@@ -17,6 +17,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pedramktb/go-ctxotel"
 	"github.com/pedramktb/go-ctxslog"
+	"github.com/pedramktb/go-typx"
 	postgresC "github.com/testcontainers/testcontainers-go/modules/postgres"
 
 	"github.com/pedramktb/go-envy"
@@ -27,7 +28,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Postgres(ctx context.Context, component string, opts map[string]string) (*pgxpool.Pool, error) {
+func Postgres(ctx context.Context, component string, opts ...typx.KV[string, string]) (*pgxpool.Pool, error) {
 	prefix := "ODJ_DEP_" + strings.ToUpper(component) + "_DB_"
 	host, _, _ := envy.Get[string](prefix + "HOST")
 	if host == "" {
@@ -54,8 +55,8 @@ func Postgres(ctx context.Context, component string, opts map[string]string) (*p
 	}
 
 	q := u.Query()
-	for k, v := range opts {
-		q.Set(k, v)
+	for _, kv := range opts {
+		q.Set(kv.Key, kv.Val)
 	}
 	u.RawQuery = q.Encode()
 
@@ -148,7 +149,7 @@ func (*queryTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.
 	span.End()
 }
 
-func PostgresTestContainer(ctx context.Context, opts map[string]string) (container testcontainers.Container) {
+func PostgresTestContainer(ctx context.Context, opts ...typx.KV[string, string]) (container testcontainers.Container) {
 	_ = os.Setenv("TZ", "UTC")
 
 	postgresContainer, err := postgresC.Run(ctx, "postgres:14.17",
@@ -166,7 +167,7 @@ func PostgresTestContainer(ctx context.Context, opts map[string]string) (contain
 	return postgresContainer
 }
 
-func postgresTestContainerConnection(ctx context.Context, container testcontainers.Container, opts map[string]string) (db *pgxpool.Pool) {
+func postgresTestContainerConnection(ctx context.Context, container testcontainers.Container, opts ...typx.KV[string, string]) (db *pgxpool.Pool) {
 	ip, err := container.Host(ctx)
 	if err != nil {
 		panic(err)
@@ -182,8 +183,8 @@ func postgresTestContainerConnection(ctx context.Context, container testcontaine
 		Path:   "postgres",
 	}
 	q := u.Query()
-	for k, v := range opts {
-		q.Set(k, v)
+	for _, kv := range opts {
+		q.Set(kv.Key, kv.Val)
 	}
 	u.RawQuery = q.Encode()
 	config, err := pgxpool.ParseConfig(u.String())
@@ -200,19 +201,26 @@ func postgresTestContainerConnection(ctx context.Context, container testcontaine
 	return pool
 }
 
-func PostgresTestContainerCreateDB(ctx context.Context, container testcontainers.Container, name string, opts map[string]string) *pgxpool.Pool {
-	pool := postgresTestContainerConnection(ctx, container, opts)
+func PostgresTestContainerCreateDB(ctx context.Context, container testcontainers.Container, name string, opts ...typx.KV[string, string]) *pgxpool.Pool {
+	pool := postgresTestContainerConnection(ctx, container, opts...)
 	_, err := pool.Exec(ctx, fmt.Sprintf("CREATE DATABASE %q", name))
 	if err != nil {
 		panic(err)
 	}
 	pool.Close()
-	return postgresTestContainerConnection(ctx, container, opts)
+	return postgresTestContainerConnection(ctx, container, opts...)
 }
 
-func PostgresTestContainerDeleteDB(ctx context.Context, container testcontainers.Container, name string, pool *pgxpool.Pool) {
+func PostgresTestContainerDeleteDB(ctx context.Context, container testcontainers.Container, name string, pool *pgxpool.Pool, opts ...typx.KV[string, string]) {
 	pool.Close()
-	pool = postgresTestContainerConnection(ctx, container, map[string]string{})
+	pool = postgresTestContainerConnection(ctx, container, opts...)
 	_, _ = pool.Exec(ctx, fmt.Sprintf("DROP DATABASE %q WITH (force)", name))
 	pool.Close()
+}
+
+func PostgresTestContainerSetupDB(ctx context.Context, container testcontainers.Container, name string, opts ...typx.KV[string, string]) (*pgxpool.Pool, func()) {
+	pool := PostgresTestContainerCreateDB(ctx, container, name, opts...)
+	return pool, func() {
+		PostgresTestContainerDeleteDB(ctx, container, name, pool, opts...)
+	}
 }
