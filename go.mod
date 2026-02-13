@@ -6,11 +6,9 @@ require (
 	github.com/go-faster/jx v1.2.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/jackc/pgx/v5 v5.8.0
-	github.com/joho/godotenv v1.5.1
 	github.com/ogen-go/ogen v1.18.0
 	github.com/pedramktb/go-ctxotel v1.0.1
 	github.com/pedramktb/go-ctxslog v1.0.2
-	github.com/pedramktb/go-envy v1.0.0
 	github.com/pedramktb/go-lifecycle v1.0.0
 	github.com/pedramktb/go-tagerr v1.2.0
 	github.com/pedramktb/go-typx v1.3.0

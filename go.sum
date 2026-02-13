@@ -82,8 +82,6 @@ github.com/jackc/pgx/v5 v5.8.0 h1:TYPDoleBBme0xGSAX3/+NujXXtpZn9HBONkQC7IEZSo=
 github.com/jackc/pgx/v5 v5.8.0/go.mod h1:QVeDInX2m9VyzvNeiCJVjCkNFqzsNb43204HshNSZKw=
 github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo=
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
-github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
-github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/klauspost/compress v1.18.1 h1:bcSGx7UbpBqMChDtsF28Lw6v/G94LPrrbMbdC3JH2co=
@@ -133,8 +131,6 @@ github.com/pedramktb/go-ctxotel v1.0.1 h1:WWhrgDRR4psN2AV8PHfYDb883KkWtnJcKXiYHQ
 github.com/pedramktb/go-ctxotel v1.0.1/go.mod h1:W47DsXa4gge7hPc/Jpk+9xJG7MYyLB5sXMmPJql5vcI=
 github.com/pedramktb/go-ctxslog v1.0.2 h1:KUJJRXmTJZ/9AqnL7HGMIXBvdHyrks2G/gwbyIsWFS4=
 github.com/pedramktb/go-ctxslog v1.0.2/go.mod h1:gy4Kxe++uisY+WpLOoCUggwBYCtb+8jVfyHnRd9L0uE=
-github.com/pedramktb/go-envy v1.0.0 h1:q+aIS8LEngDgQ5rHtQ6KlO0wqE5oLcegNzHBuQupObA=
-github.com/pedramktb/go-envy v1.0.0/go.mod h1:Nfz53Dl4mWkS57Ru3i+RaLZFTZwKtBKEZbGDjQwIxEE=
 github.com/pedramktb/go-lifecycle v1.0.0 h1:0jBe+cZ/8PyWUEjoKHmxFXPGeQM4jqnZoZ2uwzz8Yj8=
 github.com/pedramktb/go-lifecycle v1.0.0/go.mod h1:dEVFg9xEHwPpw/3CuDXXT+uw4E9yiGNjKlkKbBNjH2Q=
 github.com/pedramktb/go-tagerr v1.2.0 h1:wN1hw3voxNKWk3VOYX0fI4sd0xhpKBEyUiJQ7HvI0p0=

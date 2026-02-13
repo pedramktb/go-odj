@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/go-faster/jx"
-	"github.com/pedramktb/go-envy"
 )
 
 // GitSHA is the Git commit SHA of the binary, which is expected to be set at build time using ldflags.
@@ -35,49 +34,15 @@ var Iter string
 // - For StageDev, the preRelease suffix is "-beta".
 // - For any other stage (including StageLocal), the preRelease suffix is "-alpha" if the version is not "dev".
 // If Iter is empty, it will be omitted from the version string.
-var FullVersion = func() string {
-	version := Version
-	if version == "" {
-		Version = "dev"
-		version = "dev"
-	}
-	if Iter == "" {
-		return version
-	}
-	if version == "dev" {
-		return version + "." + Iter
-	}
-	switch Stage {
-	case StageProd, StageTest:
-		return version
-	case StageQA:
-		return version + "-rc." + Iter
-	case StageDev:
-		return version + "-beta." + Iter
-	default:
-		return version + "-alpha." + Iter
-	}
-}()
+var FullVersion string
 
 // Product is the product name of the ODJ component, determined by the ODJ_EE_PRODUCT environment variable.
 // It defaults to "unknown" if not set or empty.
-var Product = func() string {
-	product, _, _ := envy.Get[string]("ODJ_EE_PRODUCT")
-	if product != "" {
-		return product
-	}
-	return "unknown"
-}()
+var Product string
 
 // Component is the component name of the ODJ component, determined by the ODJ_EE_COMPONENT environment variable.
 // It defaults to "unknown" if not set or empty.
-var Component = func() string {
-	comp, _, _ := envy.Get[string]("ODJ_EE_COMPONENT")
-	if comp != "" {
-		return comp
-	}
-	return "unknown"
-}()
+var Component string
 
 // InfoHandler returns an HTTP handler function that serves build and version information as a JSON response.
 func InfoHandler(deps ...func(ctx context.Context) (depName string, jsonBytes []byte)) func(w http.ResponseWriter, r *http.Request) {
