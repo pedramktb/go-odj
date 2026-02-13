@@ -73,6 +73,12 @@ func InfoHandler(deps ...func(ctx context.Context) (depName string, jsonBytes []
 			e.Str(BuildDate)
 		}
 
+		for i := range deps {
+			name, data := deps[i](r.Context())
+			e.FieldStart(name)
+			e.Raw(data)
+		}
+
 		e.ObjEnd()
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
