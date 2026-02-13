@@ -51,12 +51,6 @@ func InfoHandler(deps ...func(ctx context.Context) (depName string, jsonBytes []
 		defer jx.PutEncoder(e)
 		e.ObjStart()
 
-		e.FieldStart("build_date")
-		e.Str(BuildDate)
-
-		e.FieldStart("version")
-		e.Str(FullVersion)
-
 		e.FieldStart("product")
 		e.Str(Product)
 
@@ -65,6 +59,19 @@ func InfoHandler(deps ...func(ctx context.Context) (depName string, jsonBytes []
 
 		e.FieldStart("stage")
 		e.Str(Stage.String())
+
+		e.FieldStart("version")
+		e.Str(FullVersion)
+
+		if GitSHA != "" {
+			e.FieldStart("git_sha")
+			e.Str(GitSHA)
+		}
+
+		if BuildDate != "" {
+			e.FieldStart("build_date")
+			e.Str(BuildDate)
+		}
 
 		e.ObjEnd()
 
