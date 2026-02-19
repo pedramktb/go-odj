@@ -20,13 +20,13 @@ import (
 // to the specified endpoint using basic authentication.
 func OtelTrace(ctx context.Context, endpoint, user, pass string) (context.Context, error) {
 	if endpoint == "" {
-		return nil, errors.New("otel trace endpoint is required")
+		return ctx, errors.New("otel trace endpoint is required")
 	}
 	if user == "" {
-		return nil, errors.New("otel trace user is required")
+		return ctx, errors.New("otel trace user is required")
 	}
 	if pass == "" {
-		return nil, errors.New("otel trace password is required")
+		return ctx, errors.New("otel trace password is required")
 	}
 
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
@@ -49,7 +49,7 @@ func OtelTrace(ctx context.Context, endpoint, user, pass string) (context.Contex
 
 	exporter, err := otlptracegrpc.New(ctx, opts...)
 	if err != nil {
-		return nil, err
+		return ctx, err
 	}
 
 	resources, err := resource.New(ctx,
@@ -62,7 +62,7 @@ func OtelTrace(ctx context.Context, endpoint, user, pass string) (context.Contex
 		),
 	)
 	if err != nil {
-		return nil, err
+		return ctx, err
 	}
 
 	return ctxotel.NewTracerProviderCtx(ctx,
