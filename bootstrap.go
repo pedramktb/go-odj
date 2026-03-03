@@ -20,9 +20,7 @@ import (
 func Bootstrap() (context.Context, context.CancelFunc, <-chan error) {
 	_ = os.Setenv("TZ", "UTC")
 
-	ctx, cancel, shutdownErrs := lifecycle.Context(time.Minute)
-
-	ctx = Logging(ctx)
+	ctx, cancel, shutdownErrs := lifecycle.ContextFrom(Logging(context.Background()), time.Minute)
 
 	if _, err := maxprocs.Set(maxprocs.Logger(func(s string, i ...any) {
 		ctxslog.FromContext(ctx).InfoContext(ctx, fmt.Sprintf(s, i...))

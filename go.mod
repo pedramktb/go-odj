@@ -9,7 +9,7 @@ require (
 	github.com/ogen-go/ogen v1.18.0
 	github.com/pedramktb/go-ctxotel v1.0.1
 	github.com/pedramktb/go-ctxslog v1.0.2
-	github.com/pedramktb/go-lifecycle v1.0.0
+	github.com/pedramktb/go-lifecycle v1.1.0
 	github.com/pedramktb/go-tagerr v1.2.0
 	github.com/pedramktb/go-typx v1.3.0
 	github.com/testcontainers/testcontainers-go v0.40.0

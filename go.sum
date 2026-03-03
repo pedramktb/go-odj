@@ -131,8 +131,8 @@ github.com/pedramktb/go-ctxotel v1.0.1 h1:WWhrgDRR4psN2AV8PHfYDb883KkWtnJcKXiYHQ
 github.com/pedramktb/go-ctxotel v1.0.1/go.mod h1:W47DsXa4gge7hPc/Jpk+9xJG7MYyLB5sXMmPJql5vcI=
 github.com/pedramktb/go-ctxslog v1.0.2 h1:KUJJRXmTJZ/9AqnL7HGMIXBvdHyrks2G/gwbyIsWFS4=
 github.com/pedramktb/go-ctxslog v1.0.2/go.mod h1:gy4Kxe++uisY+WpLOoCUggwBYCtb+8jVfyHnRd9L0uE=
-github.com/pedramktb/go-lifecycle v1.0.0 h1:0jBe+cZ/8PyWUEjoKHmxFXPGeQM4jqnZoZ2uwzz8Yj8=
-github.com/pedramktb/go-lifecycle v1.0.0/go.mod h1:dEVFg9xEHwPpw/3CuDXXT+uw4E9yiGNjKlkKbBNjH2Q=
+github.com/pedramktb/go-lifecycle v1.1.0 h1:qNOPKaJDomp1e1rTznVgnnVsbWLX8/BfS6NTH3k+SW0=
+github.com/pedramktb/go-lifecycle v1.1.0/go.mod h1:Fpq4h6BivWb+xUEjAVAYqBHomZdfmLE+WIB2Ea3idxw=
 github.com/pedramktb/go-tagerr v1.2.0 h1:wN1hw3voxNKWk3VOYX0fI4sd0xhpKBEyUiJQ7HvI0p0=
 github.com/pedramktb/go-tagerr v1.2.0/go.mod h1:XFOUjHSJ9bS0Wr3PK2aA8yJmJbELYyVTsaKiXlosS1w=
 github.com/pedramktb/go-typx v1.3.0 h1:SovMV12Dv9lkzOCpvpSe/R7CfZrhfdHt/MPzo5EKWFk=
