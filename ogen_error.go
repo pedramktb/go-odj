@@ -24,13 +24,15 @@ func OgenErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		dcBodyErr  *ogenerrors.DecodeBodyError
 		secErr     *ogenerrors.SecurityError
 		ctErr      *validate.InvalidContentTypeError
+		valErr     *validate.Error
 	)
 	var tagErr *tagerr.Err
 	switch {
 	case errors.As(err, &tagErr):
 	case errors.As(err, &dcParamErr),
 		errors.As(err, &dcBodyErr),
-		errors.As(err, &ctErr):
+		errors.As(err, &ctErr),
+		errors.As(err, &valErr):
 		tagErr = tagerr.ErrInvalidReq.Wrap(err)
 	case errors.As(err, &secErr):
 		tagErr = tagerr.ErrNotAuth.Wrap(err)
