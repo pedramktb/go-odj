@@ -8,8 +8,6 @@ import (
 	"log/slog"
 	"net/url"
 	"os"
-	"path"
-	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -112,25 +110,10 @@ func RunWithPgLock(ctx context.Context, db *pgxpool.Pool, name string, fn func(c
 type queryTracer struct{}
 
 func (*queryTracer) TraceQueryStart(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
-	var fnName string
-	for skip := 2; ; skip++ {
-		if pc, _, _, ok := runtime.Caller(skip); ok {
-			full := runtime.FuncForPC(pc).Name()
-			if !strings.Contains(full, "github.com/jackc/pgx") {
-				fnName = path.Base(full)
-				break
-			}
-		} else {
-			fnName = "Unknown"
-			break
-		}
-	}
-	ctx, _ = ctxotel.TracerProviderFromCtx(ctx).Tracer("postgresql").Start(ctx, fnName,
-		trace.WithAttributes(
-			attribute.String("query.statement", data.SQL),
-			attribute.Int("query.arg_count", len(data.Args)),
-		),
-	)
+	ctx, _ = ctxotel.TracerProviderFromCtx(ctx).Tracer("github.com/jackc/pgx/v5").Start(ctx, "pgx.Query", trace.WithAttributes(
+		attribute.String("query.statement", data.SQL),
+		attribute.Int("query.arg_count", len(data.Args)),
+	))
 	return ctx
 }
 
