@@ -41,20 +41,25 @@ func OgenErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 	}
 
 	if tagErr.Is(tagerr.ErrInternal) {
-		ctxslog.FromContext(ctx).ErrorContext(ctx, "internal error", slog.Any("error", tagErr), slog.String("stack_trace", string(tagErr.Stack())))
+		ctxslog.FromContext(ctx).ErrorContext(ctx, "internal error",
+			slog.Any("error", tagErr), slog.String("stack_trace", string(tagErr.Stack())))
+		// We don't want to expose internal error details to the client, so we return a generic message.
+		ogenWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, "An internal error occurred")
+	} else {
+		ogenWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, tagErr.Error())
 	}
-
-	ogenWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, tagErr.Error())
 }
 
 // OgenEndpointNotFoundErrorHandler is a custom error handler for handling "endpoint not found" errors in the Ogen framework.
 func OgenEndpointNotFoundErrorHandler(w http.ResponseWriter, r *http.Request) {
-	ogenWriteErrorJSON(w, http.StatusNotFound, "endpoint_not_found", fmt.Sprintf("Requested endpoint [%s] could not be found", r.RequestURI))
+	ogenWriteErrorJSON(w, http.StatusNotFound, "endpoint_not_found",
+		fmt.Sprintf("Requested endpoint [%s] could not be found", r.RequestURI))
 }
 
 // OgenMethodNotAllowedErrorHandler is a custom error handler for handling "method not allowed" errors in the Ogen framework.
 func OgenMethodNotAllowedErrorHandler(w http.ResponseWriter, r *http.Request, allowed string) {
-	ogenWriteErrorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed", "Requested method [%s] is not allowed. Allowed methods are [%s]")
+	ogenWriteErrorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed",
+		fmt.Sprintf("Requested method [%s] is not allowed. Allowed methods are [%s]", r.Method, allowed))
 }
 
 func ogenWriteErrorJSON(w http.ResponseWriter, statusCode int, code, detail string) {
@@ -71,7 +76,5 @@ func ogenWriteErrorJSON(w http.ResponseWriter, statusCode int, code, detail stri
 	e.StrEscape(detail)
 	e.ObjEnd()
 
-	if _, err := w.Write(e.Bytes()); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
+	_, _ = w.Write(e.Bytes())
 }
