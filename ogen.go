@@ -44,25 +44,25 @@ func OgenErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Reques
 		ctxslog.FromContext(ctx).ErrorContext(ctx, "internal error",
 			slog.Any("error", tagErr), slog.String("stack_trace", string(tagErr.Stack())))
 		// We don't want to expose internal error details to the client, so we return a generic message.
-		ogenWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, "An internal error occurred")
+		httpWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, "An internal error occurred")
 	} else {
-		ogenWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, tagErr.Error())
+		httpWriteErrorJSON(w, tagErr.HTTPCode, tagErr.Tag, tagErr.Error())
 	}
 }
 
 // OgenEndpointNotFoundErrorHandler is a custom error handler for handling "endpoint not found" errors in the Ogen framework.
 func OgenEndpointNotFoundErrorHandler(w http.ResponseWriter, r *http.Request) {
-	ogenWriteErrorJSON(w, http.StatusNotFound, "endpoint_not_found",
+	httpWriteErrorJSON(w, http.StatusNotFound, "endpoint_not_found",
 		fmt.Sprintf("Requested endpoint [%s] could not be found", r.RequestURI))
 }
 
 // OgenMethodNotAllowedErrorHandler is a custom error handler for handling "method not allowed" errors in the Ogen framework.
 func OgenMethodNotAllowedErrorHandler(w http.ResponseWriter, r *http.Request, allowed string) {
-	ogenWriteErrorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed",
+	httpWriteErrorJSON(w, http.StatusMethodNotAllowed, "method_not_allowed",
 		fmt.Sprintf("Requested method [%s] is not allowed. Allowed methods are [%s]", r.Method, allowed))
 }
 
-func ogenWriteErrorJSON(w http.ResponseWriter, statusCode int, code, detail string) {
+func httpWriteErrorJSON(w http.ResponseWriter, statusCode int, code, detail string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(statusCode)
 
