@@ -20,17 +20,19 @@ import (
 // Errors of type tagerr.Err are returned as-is.
 func OgenErrorHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	var (
-		dcParamErr *ogenerrors.DecodeParamsError
-		dcBodyErr  *ogenerrors.DecodeBodyError
-		secErr     *ogenerrors.SecurityError
-		ctErr      *validate.InvalidContentTypeError
-		valErr     *validate.Error
+		dcParamsErr *ogenerrors.DecodeParamsError
+		dcBodyErr   *ogenerrors.DecodeBodyError
+		dcReqErr    *ogenerrors.DecodeRequestError
+		ctErr       *validate.InvalidContentTypeError
+		valErr      *validate.Error
+		secErr      *ogenerrors.SecurityError
 	)
 	var tagErr *tagerr.Err
 	switch {
 	case errors.As(err, &tagErr):
-	case errors.As(err, &dcParamErr),
+	case errors.As(err, &dcParamsErr),
 		errors.As(err, &dcBodyErr),
+		errors.As(err, &dcReqErr),
 		errors.As(err, &ctErr),
 		errors.As(err, &valErr):
 		tagErr = tagerr.ErrInvalidReq.Wrap(err)
