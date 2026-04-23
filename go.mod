@@ -6,7 +6,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.32.0
 	github.com/go-faster/jx v1.2.0
 	github.com/gogo/protobuf v1.3.2
-	github.com/jackc/pgx/v5 v5.9.1
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/ogen-go/ogen v1.20.3
 	github.com/pedramktb/go-ctxotel v1.1.0
 	github.com/pedramktb/go-ctxslog v1.0.2
