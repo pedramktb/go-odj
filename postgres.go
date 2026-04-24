@@ -14,7 +14,6 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pedramktb/go-ctxotel"
 	"github.com/pedramktb/go-ctxslog"
 	"github.com/pedramktb/go-typx"
 	postgresC "github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -110,15 +109,20 @@ func RunWithPgLock(ctx context.Context, db *pgxpool.Pool, name string, fn func(c
 type queryTracer struct{}
 
 func (*queryTracer) TraceQueryStart(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
-	ctx, _ = ctxotel.TracerProviderFromCtx(ctx).Tracer("github.com/jackc/pgx/v5").Start(ctx, "pgx.Query", trace.WithAttributes(
-		attribute.String("query.statement", data.SQL),
-		attribute.Int("query.arg_count", len(data.Args)),
-	))
+	if span := trace.SpanFromContext(ctx); span.IsRecording() {
+		span.SetAttributes(
+			attribute.String("query.statement", data.SQL),
+			attribute.Int("query.arg_count", len(data.Args)),
+		)
+	}
 	return ctx
 }
 
 func (*queryTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.TraceQueryEndData) {
 	span := trace.SpanFromContext(ctx)
+	if !span.IsRecording() {
+		return
+	}
 	span.SetAttributes(
 		attribute.String("query.command_tag", data.CommandTag.String()),
 		attribute.Int64("query.rows_affected", data.CommandTag.RowsAffected()),
@@ -126,10 +130,7 @@ func (*queryTracer) TraceQueryEnd(ctx context.Context, conn *pgx.Conn, data pgx.
 	if data.Err != nil {
 		span.RecordError(data.Err)
 		span.SetStatus(codes.Error, data.Err.Error())
-	} else {
-		span.SetStatus(codes.Ok, "OK")
 	}
-	span.End()
 }
 
 // PostgresTestContainer starts a new Postgres test container with the specified options and returns the container instance.
